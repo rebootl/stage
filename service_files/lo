@@ -1,0 +1,17 @@
+# stage init - service file
+#
+# setting up loopback device
+
+start() {
+    /usr/sbin/ip link set up dev lo
+}
+
+stop() {
+    # --> make a real stop here
+    return 0
+}
+
+poll() {
+    # --> make a poll here ?
+    return 1
+}

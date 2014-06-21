@@ -1,0 +1,44 @@
+#!/bin/bash
+# (only to get syntax highlighting)
+#
+
+make_rtab_dir() {
+    # make the rtab dir if it doesn't exist
+    # (needs to be a function, cause when booting the fs might not be here yet)
+    [ ! -d $RTAB_DIR ] && mkdir -p $RTAB_DIR
+    [ ! -d $OUT_DIR ] && mkdir -p $OUT_DIR
+}
+
+get_services_names() {
+    # *** subshell function ***
+    # get the service names of a stage
+    # (by following the links if they are, else use the filenames)
+    #
+    # arguments
+    # - $1 stage name
+    #
+    # returns services
+
+    local stage_path=$COMMON_STAGE_DIR/$1
+
+    # (check)
+    if [ ! -d $stage_path ]; then
+        return 1
+    fi
+
+    local stage_files=$(ls $stage_path)
+
+    local services=""
+    local service_name
+    # (follow the links)
+    for file in $stage_files; do
+        if [ -L "${stage_path}/${file}" ]; then
+            service_name=$(basename $(readlink "${stage_path}/${file}"))
+        else
+            service_name=$file
+        fi
+        services="$services $service_name "
+    done
+    echo $services
+    return 0
+}

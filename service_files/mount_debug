@@ -1,0 +1,15 @@
+# stage init - service file
+#
+# tmpfs
+
+start() {
+    mount -t debugfs none /sys/kernel/debug -o defaults
+}
+
+stop() {
+    umount -r /sys/kernel/debug
+}
+
+poll() {
+    mountpoint -q /sys/kernel/debug
+}

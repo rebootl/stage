@@ -1,0 +1,16 @@
+# stage init - service file
+#
+# setting hostname
+
+start() {
+    cat /etc/hostname >| /proc/sys/kernel/hostname
+}
+
+stop() {
+    return 0
+}
+
+poll() {
+    #echo "Hostname is set."
+    return 1
+}

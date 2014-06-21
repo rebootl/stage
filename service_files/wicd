@@ -1,0 +1,38 @@
+# stage init - service file
+#
+# wicd
+
+WAITFOR=dbus
+
+start() {
+    export PATH
+    wicd
+}
+
+stop() {
+    # check the state for return ???
+    # ( 0 = success, 1 = failed )
+    local state
+    killall wicd
+    state=$?
+
+    # (apparently dhcpcd and wpa_supplicant may or may not run...)
+    pgrep dhcpcd > /dev/null && killall dhcpcd
+    pgrep wpa_supplicant > /dev/null && killall wpa_supplicant
+
+    return $state
+
+# (something like this could be used to collect the states and
+#  return respectively, but it's an overkill)
+#     states="$states $?"
+#    
+#    for state in $states; do
+#        if [ "$state" == "0" ]; then
+#            local ret_state=0
+#        else
+#            local ret_state=1
+#        fi
+#    done
+#
+#    return $ret_state
+}

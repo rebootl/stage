@@ -1,0 +1,20 @@
+# stage init - service file
+#
+# kill remaining processes
+
+stop() {
+    # kill remaining processes
+    # ========================
+
+    # (nicely)
+    echo "sys-shutdown: sending all processes the TERM signal..." 1>&2
+    busybox killall5 -TERM
+    sleep 3
+    # (hard)
+    echo "sys-shutdown: sending all processes the KILL signal..." 1>&2
+    busybox killall5 -KILL
+}
+
+poll() {
+    return 0
+}

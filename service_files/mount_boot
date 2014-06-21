@@ -1,0 +1,15 @@
+# stage init - service file
+#
+# mount boot (/boot)
+
+start() {
+    mount -o defaults /dev/sda1 /boot
+}
+
+stop() {
+    umount -r /boot
+}
+
+poll() {
+    mountpoint -q /boot
+}

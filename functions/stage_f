@@ -1,0 +1,124 @@
+#!/bin/bash
+# (only to get syntax highlighting)
+#
+
+stage_show() {
+    # show the status of services in the given stage,
+    # if no stage is given, show all stages
+    #
+    # arguments
+    # - $1 stage
+
+    local services
+
+    if [ "$1" == "" ]; then
+        local stage_name
+        for stage_name in $(ls $COMMON_STAGE_DIR); do
+            #echo "stage dir path: $stage_dir_path"
+            echo "stage: $stage_name"
+
+            services=$(get_services_names $stage_name)
+
+            local res
+            local count=0
+            declare -a out_a
+            for service in $services; do
+                res="$(poll_routine $service &)"
+                out_a[count]="$res"
+                let count="$count+1"
+            done
+            wait
+            for entry in "${out_a[@]}"; do
+                echo "  $entry"
+            done
+            unset out_a
+        done
+        wait
+        exit 0
+    fi
+
+    services=$(get_services_names $1)
+    if [ "$?" == 1 ]; then
+        echo "stage: $1 not found under the common stage directory ($COMMON_STAGE_DIR/)."
+        exit 1
+    fi
+
+    for service in $services; do
+        poll_routine $service &
+    done
+    wait
+    exit 0
+}
+
+stage_call() {
+    # handle a stage
+    #
+    # arguments
+    # - $1 <action> launch,revert
+    # - $2 stage name
+
+    if [ "$1" == "launch" ]; then
+        local cmd=start
+        local msg_b="Launching..."
+        local msg_e="Launched."
+    else
+        local cmd=stop
+        local msg_b="Reverting..."
+        local msg_e="Reverted."
+    fi
+
+    local services
+    services=$(get_services_names $2)
+    if [ "$?" == 1 ]; then
+        echo "stage: $1 not found under the common stage directory ($COMMON_STAGE_DIR/)."
+        exit 1
+    fi
+
+    echo_color 8 "stage: $2: $msg_b"
+
+    # (initiate service manager)
+    dep_call $cmd "$services"
+
+# (old call)
+#    local service
+#    for service in $services; do
+#        /usr/lib/stage/service_handler $cmd $service &
+#    done
+#    wait
+}
+
+stage_new() {
+    # create a new stage
+    #
+    # arguments
+    # - $1 stage name
+
+    # (check if already there)
+    if [ -d "$COMMON_STAGE_DIR/$1" ]; then
+        echo "stage: $1: Already present."
+        exit 1
+    fi
+    mkdir "$COMMON_STAGE_DIR/$1"
+}
+
+stage_del() {
+    # delete a stage
+    #
+    # arguments
+    # - $1 stage name
+
+    # (check if there)
+    if [ ! -d "$COMMON_STAGE_DIR/$1" ]; then
+        echo "stage: $1: Not found."
+        exit 1
+    fi
+
+    # (check if empty)
+    if [ "$(ls -A $COMMON_STAGE_DIR/$1)" ]; then
+        echo "stage: $1: Not empty, please remove services first."
+        exit 1
+    fi
+
+    rmdir "$COMMON_STAGE_DIR/$1"
+}
+

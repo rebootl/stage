@@ -1,0 +1,32 @@
+#!/bin/bash
+# (only to get syntax highlighting)
+#
+
+shutdown_pre() {
+
+    # stop the gettys
+    pkill -f "respawn -d 3 /usr/bin/agetty"
+
+}
+
+shutdown_post() {
+
+    # umount everything
+    echo_color 3 "stage: unmount everything..."
+    /usr/bin/umount -a -r
+
+    # umount the api filesystem
+#    echo_color 3 "stage: umount the api filesystem..."
+#    umount -r /run
+
+    # remount root readonly
+#    echo_color 3 "stage: remount / readonly..."
+#    /usr/bin/mount -o remount,ro /
+
+    # adaption: optional debug shell 
+    read -n 1 -p "Press [d] for a debug shell or another key to proceed..." -s key
+    if [ "$key" == 'd' ] || [ "$key" == 'D' ]; then
+        /usr/bin/bash
+    fi
+
+}

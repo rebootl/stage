@@ -1,0 +1,18 @@
+# stage init - service file
+#
+# tmpfs
+
+# (wait for swap to make this unmount before switching off swap)
+WAITFOR="swap"
+
+start() {
+    mount -t tmpfs tmpfs /tmp -o mode=1777,nosuid,nodev
+}
+
+stop() {
+    umount -r /tmp
+}
+
+poll() {
+    mountpoint -q /tmp
+}

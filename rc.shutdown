@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# stage - shutdown helper
+case $1 in
+    init_p)
+        /usr/bin/stage init_p
+        ;;
+    init_r)
+        /usr/bin/stage init_r
+        ;;
+    *)
+        echo "Wrong option."
+        ;;
+esac

@@ -1,0 +1,14 @@
+# stage init - service file
+#
+# sshd
+
+WAITFOR=wicd
+
+start() {
+    # (requires an absolute path)
+    /usr/bin/sshd
+}
+
+#poll() {
+#    pgrep sshd
+#}

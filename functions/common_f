@@ -1,0 +1,127 @@
+#!/bin/bash
+# (only to get syntax highlighting)
+#
+# stage init - common functions
+
+echo_color() {
+  color="$1"
+  shift
+  text="$@"
+  printf "\033[1;3${color}m$text\033[00m\n"
+}
+
+echo_color_ext() {
+  color="$1"
+  shift
+  text="$1"
+  printf "\033[1;3${color}m$text\033[00m $2\n"
+}
+
+include_service_file() {
+    # include the service file, if present
+    #
+    # arguments
+    # - $1 service name
+    #
+    # the service file optionally contains start(), stop(), poll()
+    # and WAITFOR, include_service_files should be called directly
+    # but the calling function should be in a subshell, to keep
+    # the above functions and variables isolated from the global scope
+    #
+    # return:
+    # result:
+    [ -e $COMMON_SERVICE_DIR/$1 ] && source $COMMON_SERVICE_DIR/$1
+}
+
+get_needed_services() {
+    # *** subshell function ***
+    # get the needed services
+    #
+    # arguments
+    # - $1 service name
+    #
+    # return:
+    # result: list of needed services
+
+    include_service_file $1
+
+    echo $WAITFOR
+}
+
+get_dependent_services() {
+    # *** subshell function ***
+    # get the dependent services
+    #
+    # arguments:
+    # - $1 service name
+    #
+    # return:
+    # result: list of dependent services
+
+    local dep_serv_list=""
+
+    local service_file
+    for service_file in $(ls $COMMON_SERVICE_DIR); do
+        local WAITFOR=""
+        include_service_file $service_file
+        if [[ "$WAITFOR" =~ "$1" ]]; then
+            dep_serv_list="$dep_serv_list $service_file"
+        fi
+        unset -f start
+        unset -f stop
+        unset -f poll
+    done
+
+    # (old loop)
+#    local regex="WAITFOR=.*${1}.*"
+#    ls $COMMON_SERVICE_DIR | while read -r service_file; do
+#    for service_file in $(ls $COMMON_SERVICE_DIR); do
+#        echo $service_file 1>&2
+#        if grep $regex $COMMON_SERVICE_DIR/$service_file > /dev/null; then
+#            # (add it to the dep serv list)
+#            dep_serv_list="$dep_serv_list $service_file"
+#        fi
+#    done
+
+    echo $dep_serv_list
+}
+
+#set_state() {
+#    # write state to runtab
+#    # arguments
+#    # - $1 this service name
+#    # - $2 state
+#    local state_file=$RUNTAB_DIR/$1
+#
+#    echo $2 > $state_file
+#    echo $$ > ${state_file}_spid
+#}
+
+#get_state() {
+#    # get state from runtab
+#    # arguments:
+#    # - $1 service name
+#    #
+#    # returns the service state
+#
+#    local state_file=$RUNTAB_DIR/$1
+#
+#    if [ ! -e $RUNTAB_DIR/$service ]; then
+#        echo "NEW"
+#        return
+#    fi
+#
+#    local state=$(cat $state_file)
+#
+#    local good_states="r s l f a N"
+#
+#    for good_state in $good_states; do
+#        if [ "$state" == "$good_state" ]; then
+#            echo $state
+#            return
+#        fi
+#    done
+#
+#    # (service file corrupted, echo C)
+#    echo "C"
+#}

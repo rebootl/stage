@@ -1,0 +1,153 @@
+#!/bin/bash
+# (only to get syntax highlighting)
+#
+
+poll_routine() {
+    # poll routine for a service
+    #
+    # arguments
+    # - $1 service name
+    #
+    # return:
+    # result:
+
+    # (get state)
+    local ret
+    (poll_service $1)
+    ret=$?
+    if [ "$ret" == 0 ]; then
+        echo_color_ext 2 "\u25CF" "$1"
+    elif [ "$ret" == 1 ]; then
+        echo_color_ext 0 "\u25CF" "$1"
+    else
+        echo_color_ext 5 "\u25CF" "$1"
+    fi
+    return $ret
+}
+
+service_status() {
+    # show status information
+    #
+    # arguments
+    # - $1 service name
+    local ret
+    if [ "$1" == "" ]; then
+        local service
+        for service in $(ls $COMMON_SERVICE_DIR); do
+            poll_routine $service &
+            ret=$?
+        done
+        wait
+    else
+        poll_routine $1
+        ret=$?
+    fi
+    exit $ret
+}
+
+service_info() {
+    # show detailed service information
+    #
+    # arguments
+    # - $1 service name
+    # (poll)
+    local ret
+    poll_routine $1
+    ret=$?
+
+    # (give status information)
+    if [ "$ret" == 0 ]; then
+        echo "(running)"
+    elif [ "$ret" == 1 ]; then
+        echo "(stopped/finished)"
+    elif [ "$ret" == 2 ]; then
+        echo "(special status, executes always, never wait)"
+    elif [ "$ret" -gt 2 ]; then
+        echo "(special status, executes always, always wait)"
+    fi
+
+    # (give service file information)
+    if [ -f "$COMMON_SERVICE_DIR/$1" ]; then
+        echo "(service file found)"
+        ( include_service_file $1
+            [ -n "$WAITFOR" ] && echo "  WAITFOR is set to: $WAITFOR"
+            (declare -F start >/dev/null) && echo "  start is defined"
+            (declare -F stop >/dev/null) && echo "  stop is defined"
+            (declare -F poll >/dev/null) && echo "  poll is defined"
+        )
+    else
+        echo "(no service file found)"
+    fi
+
+    # (give stage information)
+    local linked=""
+    local stage
+    local file
+    for stage in $(ls $COMMON_STAGE_DIR); do
+    #echo $stage
+        for file in $(ls $COMMON_STAGE_DIR/$stage); do
+        #echo $file
+            if [ -L $COMMON_STAGE_DIR/$stage/$file ]; then
+                if [ "$(basename $(readlink $COMMON_STAGE_DIR/$stage/$file))" == "$1" ]; then
+                    linked="$stage $linked"
+                fi
+            else
+                if [ "$file" == "$1" ]; then
+                    linked="$stage $linked"
+                fi
+            fi
+        done
+    done
+    echo
+    echo "File is present in stages: $linked"
+
+    # (last output)
+    echo
+    echo "Last output:"
+    echo "===================="
+    if [ -f "$RTAB_DIR/${1}_out" ]; then
+        while read -r line; do
+            echo "  $line"
+        done < $OUT_DIR/${1}_out
+    else
+        echo "<empty>"
+    fi
+}
+
+service_add() {
+    # add a service to a stage
+    #
+    # arguments
+    # - $1 service name
+    # - $2 stage name
+
+    # (check if already there)
+    if [ -e "$COMMON_STAGE_DIR/$2/$1" ]; then
+        echo "stage: Service $1 seems already in stage $2."
+        exit 1
+    fi
+
+    # (if there's a service file, link it)
+    if [ -f "$COMMON_SERVICE_DIR/$1" ]; then
+        ln -s "$COMMON_SERVICE_DIR/$1" "$COMMON_STAGE_DIR/$2/$1"
+    else
+        touch "$COMMON_STAGE_DIR/$2/$1"
+    fi
+}
+
+service_remove() {
+    # remove a service from a stage
+    #
+    # arguments
+    # - $1 service name
+    # - $2 stage name
+
+    # (check if there)
+    if [ ! -e "$COMMON_STAGE_DIR/$2/$1" ]; then
+        echo "stage: Service $1 seems not in stage $2."
+        exit 1
+    fi
+
+    # (remove)
+    rm $COMMON_STAGE_DIR/$2/$1
+}

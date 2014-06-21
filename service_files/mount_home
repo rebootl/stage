@@ -1,0 +1,15 @@
+# stage init - service file
+#
+# mount home (/home)
+
+start() {
+    mount -o defaults /dev/sda5 /home
+}
+
+stop() {
+    umount -r /home
+}
+
+poll() {
+    mountpoint -q /home
+}

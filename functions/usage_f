@@ -1,0 +1,58 @@
+#!/bin/bash
+# (only to get syntax highlighting)
+#
+
+usage() {
+    echo "Usage: stage <action> [stage/service]"
+    echo
+    echo "Actions:"
+    echo "========"
+    echo
+    echo "Reserved"
+    echo "--------"
+    echo "  init_b      reserved (called from init)"
+    echo "  init_p      reserved (called from init)"
+    echo "  init_r      reserved (called from init)"
+    echo
+    echo "System commands"
+    echo "---------------"
+    echo "  poweroff    shutdown and poweroff system"
+    echo "  reboot      shutdown and reboot system"
+    echo
+    echo "Stage commands"
+    echo "--------------"
+    echo "  show        show services of [stage] or all"
+    echo "  launch      start services in [stage]"
+    echo "  revert      stop services in [stage]"
+    echo
+    echo "  new         create new stage [stage]"
+    echo "  del         delete stage [stage]"
+    echo
+    echo "Service commands"
+    echo "----------------"
+    echo "  status      show status of [service] or all (default)"
+    echo "  info        show detailed service information, all or [service]"
+    echo "  start       start [service] and all needed services"
+    echo "  stop        stop [service] and all dependent services"
+# --> deprecated
+# (--> the old start/stop behaviour, described below, could be added)
+# (--> a start/stop-nodeps could be added)
+#    echo "  start       start [service], will wait for needed services"
+#    echo "              in the background"
+#    echo "  stop        stop [service], will wait for dependent services"
+#    echo "              in the background"
+#    echo "  depstart    start [service] and all needed services"
+#    echo "  depstop     stop [service] and all dependent services"
+#    echo
+#    echo "  abort       abort waiting services"
+    echo
+    echo "  add         add [service] to [stage]"
+    echo "  remove      remove [service] from [stage]"
+# --> to adapt
+#    echo
+#    echo "Exit codes"
+#    echo "----------"
+#    echo "  0 success or service running"
+#    echo "  1 failure or service stopped"
+#    echo "  2 special service"
+}

@@ -1,0 +1,33 @@
+# stage init - service file
+#
+# fsck (omitting root)
+
+start() {
+    # -A walk through fstab
+    # -R omit root (checked in the initramfs, on Arch)
+    # -T don't show title
+    # -M don't check mounted (safety precaution)
+    # -p (ext4) auto-repair
+    #
+    # exit codes:
+    # 0    - No errors
+    # 1    - File system errors corrected
+    # 2    - File system errors corrected, system should
+    #        be rebooted
+    # 4    - File system errors left uncorrected
+    # 8    - Operational error
+    # 16   - Usage or syntax error
+    # 32   - E2fsck canceled by user request
+    # 128  - Shared library error
+    #
+    # --> handle the exit codes ... ?
+    fsck -ARTMp
+}
+
+stop() {
+    return 0
+}
+
+poll() {
+    return 1
+}

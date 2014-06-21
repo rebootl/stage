@@ -1,0 +1,9 @@
+# stage init - service file
+#
+# ntpd
+
+WAITFOR=wicd
+
+start() {
+    ntpd -g -u ntp
+}

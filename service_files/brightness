@@ -1,0 +1,15 @@
+# stage init - service file
+#
+# set backlight brightness to lower level
+
+start() {
+    echo "2600" > /sys/class/backlight/intel_backlight/brightness
+}
+
+stop() {
+    return 0
+}
+
+poll() {
+    return 1
+}

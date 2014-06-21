@@ -1,0 +1,15 @@
+# stage init - service file
+#
+# alsa
+
+start() {
+    alsactl restore
+}
+
+stop() {
+    alsactl store
+}
+
+poll() {
+    return 2
+}

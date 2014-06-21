@@ -1,0 +1,16 @@
+# stage init - service file
+#
+# swap
+
+start() {
+    swapon -a
+}
+
+stop() {
+    swapoff -a
+}
+
+poll() {
+    local res=$(swapon --show)
+    [ "$res" == "" ] && return 1 || return 0
+}

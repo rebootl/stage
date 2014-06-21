@@ -1,0 +1,195 @@
+#!/bin/bash
+#
+# stage - a simple dependency based service manager and init system
+#
+# written in bash
+#
+
+# (set function dir)
+F_DIR="/usr/lib/stage/functions"
+
+# (include functions)
+source $F_DIR/boot_prepost_sequences_f
+source $F_DIR/shutdown_prepost_sequences_f
+
+source $F_DIR/common_f
+
+source $F_DIR/stage_f
+source $F_DIR/stage_helper_f
+
+source $F_DIR/service_f
+source $F_DIR/service_subf
+
+source $F_DIR/service_manager_f
+
+source $F_DIR/usage_f
+
+# (set config file)
+# contains:
+# - COMMON_SERVICE_DIR
+# - COMMON_STAGE_DIR
+# - BOOT_STAGES
+# - SHUTDOWN_STAGES
+# - RTAB_DIR
+# - RETRY_TIMEOUT (--> not used atm)
+CONFIG="/etc/stage/stage.conf"
+if [ -f $CONFIG ]; then
+    source $CONFIG
+else
+    echo "stage: Failure: Config file not found."
+    exit 1
+fi
+
+on_boot() {
+    # boot sequence
+
+    # pre-boot sequence
+    boot_pre
+
+    # make the trigger dir
+    echo_color 3 "stage: creating trigger dir..."
+    make_rtab_dir
+
+    local stage
+    for stage in $BOOT_STAGES; do
+        stage_call launch $stage
+    done
+
+    # post-boot sequence
+    boot_post
+}
+
+on_shutdown() {
+    # shutdown sequence
+
+    # --> use the reversed BOOT_STAGES... (adaption needed)
+
+    # --> find arbitrary running services ?
+
+    # pre-shutdown sequence
+    shutdown_pre
+
+    local stage
+    for stage in $SHUTDOWN_STAGES; do
+        stage_call revert $stage
+    done
+
+    # post-shutdown sequence
+    shutdown_post
+}
+
+# argument handling
+# =================
+check_arg() {
+    # check if second argument present
+    #
+    # arguments
+    # - $1 $1
+    # - $2 $2
+    if [ "$2" == "" ]; then
+        echo "Failed: $1 what?"
+        echo "See: stage help/usage"
+        exit 1
+    fi
+}
+
+check_args_service_stage() {
+    # check for args service and stage
+    #
+    # arguments
+    # - $1 service name
+    # - $2 stage name
+
+    # (check args)
+    if [ "$1" == "" ]; then
+        echo "stage: Failed: No service specified."
+        exit 1
+    elif [ "$2" == "" ]; then
+        echo "stage: Failed: No stage specified."
+        exit 1
+    elif [ ! -d "$COMMON_STAGE_DIR/$2" ]; then
+        echo "stage: $2 seems not to be a stage in stages dir ($COMMON_STAGE_DIR)"
+        exit 1
+    fi
+}
+
+case $1 in
+    init_b)
+        on_boot
+        ;;
+    init_p)
+        on_shutdown
+        # poweroff
+        # (using busybox's halt)
+        busybox poweroff -f
+        ;;
+    init_r)
+        on_shutdown
+        # reboot
+        # (using busybox's halt)
+        busybox reboot -f
+        ;;
+    poweroff)
+        kill -s USR1 1
+        ;;
+    reboot)
+        kill -s INT 1
+        ;;
+    show)
+        stage_show $2
+        ;;
+    launch|revert)
+        check_arg $1 $2
+        cmd=$1
+        shift
+        for stage in $@; do
+            stage_call $cmd $stage
+        done
+        ;;
+    new)
+        check_arg $1 $2
+        stage_new $2
+        ;;
+    del)
+        check_arg $1 $2
+        stage_del $2
+        ;;
+    status|'')
+        service_status $2
+        ;;
+    info)
+        check_arg $1 $2
+        shift
+        for service in $@; do
+            service_info $service
+        done
+        ;;
+    start|stop)
+        check_arg $1 $2
+        cmd=$1
+        shift
+        dep_call $cmd "$@"
+        ;;
+#    depstart)
+#        check_arg $1 $2
+#        service_depstart $2
+#        ;;
+#    depstop)
+#        check_arg $1 $2
+#        service_depstop $2
+#        ;;
+#    abort)
+#        pkill service_handler
+#        ;;
+    add)
+        check_args_service_stage $2 $3
+        service_add $2 $3
+        ;;
+    remove)
+        check_args_service_stage $2 $3
+        service_remove $2 $3
+        ;;
+    *)
+        usage
+        ;;
+esac

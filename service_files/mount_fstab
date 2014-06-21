@@ -1,0 +1,11 @@
+# stage init - service file
+#
+# mount filesystems from fstab
+
+start() {
+    mount -a
+}
+
+poll() {
+    return 1
+}

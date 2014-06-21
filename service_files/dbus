@@ -1,0 +1,24 @@
+# stage init - service file
+#
+# dbus
+
+start() {
+    # could do (?)
+    #dbus-uuidgen --ensure
+    #
+    # (from openrc dbus start)
+    # we need to test if /run/dbus exists
+    [ ! -e /run/dbus ] && mkdir /run/dbus
+    /usr/bin/dbus-daemon --system
+}
+
+stop() {
+    killall dbus-launch
+    killall dbus-daemon
+    [ -e /run/dbus/pid ] && rm /run/dbus/pid
+    [ -S /run/dbus/system_bus_socket ] && rm -f /run/dbus/system_bus_socket
+}
+
+poll() {
+    pgrep dbus-daemon > /dev/null
+}

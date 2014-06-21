@@ -1,0 +1,20 @@
+# stage init - service file
+#
+# switch off DGP with vgaswitcheroo
+
+start() {
+    #modprobe radeon
+    # acc. to wiki this should not be needed anymore
+    # but it doesn't work w/o...
+    # (early KMS is enabled for both and DPM for radeon)
+    echo OFF > /sys/kernel/debug/vgaswitcheroo/switch
+}
+
+stop() {
+    return 0
+}
+
+poll() {
+    # --> make a real poll here
+    return 1
+}

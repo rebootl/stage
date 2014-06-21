@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+
+start_service() {
+    # *** subshell function ***
+    # start a service
+    #
+    # arguments
+    # - $1 service name
+    #
+    # using the start() function if present
+    # otherwise try with the service name
+    #
+    # return: 0 on success 1 on failure
+    # result: service output
+
+    include_service_file $1
+
+    if (declare -f start > /dev/null); then
+        start 2>&1 || return 1
+    else
+        $1 2>&1 || return 1
+    fi
+
+    return 0
+}
+
+stop_service() {
+    # *** subshell function ***
+    # stop a service
+    # (--> could be unifified w/ start_service --> call_service)
+    #
+    # arguments
+    # - $1 service name
+    #
+    # using the stop() function if present
+    # otherwise try killing the service name
+    #
+    # return: 0 on success 1 on failure
+    # result: service output
+
+    include_service_file $1
+
+    if (declare -f stop > /dev/null); then
+        stop 2>&1 || return 1
+    else
+        killall $1 2>&1 || return 1
+    fi
+
+    return 0
+}
+
+poll_service() {
+    # *** subshell function ***
+    # poll a service
+    #
+    # arguments
+    # - $1 service name
+    #
+    # using the poll() function if present
+    # otherwise try with the service name
+    #
+    # return: 0 if running 1 if stopped
+    # result: when poll() is defined, it's output
+
+    include_service_file $1
+
+    if (declare -f poll > /dev/null); then
+        poll 2>&1
+    else
+        pgrep "^$1\$" > /dev/null 2>&1
+    fi
+
+    return $?
+}
