@@ -56,7 +56,7 @@ wicd contains WAITFOR="dbus"
 Service file names shall not contain spaces.[^1]
 
 [^1]: Yes, I'm using "for file in $(ls $dir); do", and yes, I've read
-that this is the worst thing one could do... See issues 3).
+that this is the worst thing one could do... See "Not really issues" 3).
 
 When no service file or function is found the given name of the service
 is used as fallback.
@@ -87,13 +87,21 @@ The provided shutdown sequence:
 2) revert SHUTDOWN_STAGES
 3) post_shudown (umount everything, spawn a debug shell)[^2]
 
-[^2]: See issues 1).
+[^2]: See "Not Really issues" 1).
 
 BOOT/SHUTDOWN_STAGES are defined in /etc/stage/stage.conf.
 These are executed serially, in the order given there.
 
 pre-post functions can be found in:
 /usr/lib/stage/functions/<boot/shutdown>_prepost_sequences_f
+
+
+Issues
+------
+
+1) Something needs to be done to stop services that are started
+   manually on shutdown. The others stage was intented for this
+   but this should be automated.
 
 
 Not really issues
