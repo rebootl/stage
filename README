@@ -99,9 +99,9 @@ pre-post functions can be found in:
 Issues
 ------
 
-1) Something needs to be done to stop services that are started
-   manually on shutdown. The others stage was intented for this
-   but this should be automated.
+1) On shutdown, something needs to be done to stop services that 
+   were started manually, and are not in one of the shutdown stages.
+   The "others" stage was intented for this, but this should be automated.
 
 
 Not really issues
