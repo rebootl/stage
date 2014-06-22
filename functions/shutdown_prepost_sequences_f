@@ -5,7 +5,7 @@
 shutdown_pre() {
 
     # stop the gettys
-    pkill -f "respawn -d 3 /usr/bin/agetty"
+    pkill -f "/usr/bin/ubase/respawn -d 3 /usr/bin/agetty"
 
 }
 

@@ -24,9 +24,9 @@ boot_post() {
 
     # spawn gettys always
     echo_color 3 "stage: spawning gettys..."
-    sh -c 'respawn -d 3 /usr/bin/agetty --noclear -8 -s 38400 tty1 linux' &
-    sh -c 'respawn -d 3 /usr/bin/agetty -8 -s 38400 tty2 linux' &
-    sh -c 'respawn -d 3 /usr/bin/agetty -8 -s 38400 tty3 linux' &
-    sh -c 'respawn -d 3 /usr/bin/agetty -8 -s 38400 tty4 linux' &
+    sh -c '/usr/bin/ubase/respawn -d 3 /usr/bin/agetty --noclear -8 -s 38400 tty1 linux' &
+    sh -c '/usr/bin/ubase/respawn -d 3 /usr/bin/agetty -8 -s 38400 tty2 linux' &
+    sh -c '/usr/bin/ubase/respawn -d 3 /usr/bin/agetty -8 -s 38400 tty3 linux' &
+    sh -c '/usr/bin/ubase/respawn -d 3 /usr/bin/agetty -8 -s 38400 tty4 linux' &
 
 }

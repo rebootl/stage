@@ -8,11 +8,13 @@ stop() {
 
     # (nicely)
     echo "sys-shutdown: sending all processes the TERM signal..." 1>&2
-    busybox killall5 -TERM
+    #busybox killall5 -TERM
+    /usr/bin/ubase/killall5
     sleep 3
     # (hard)
     echo "sys-shutdown: sending all processes the KILL signal..." 1>&2
-    busybox killall5 -KILL
+    #busybox killall5 -KILL
+    /usr/bin/ubase/killall5 -s KILL
 }
 
 poll() {

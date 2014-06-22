@@ -127,14 +127,18 @@ case $1 in
     init_p)
         on_shutdown
         # poweroff
-        # (using busybox's halt)
-        busybox poweroff -f
+        # (using busybox halt)
+        #busybox poweroff -f
+        # (using ubase halt)
+        /usr/bin/ubase/halt -p
         ;;
     init_r)
         on_shutdown
         # reboot
-        # (using busybox's halt)
-        busybox reboot -f
+        # (using busybox halt)
+        #busybox reboot -f
+        # (using ubase halt)
+        /usr/bin/ubase/halt -r
         ;;
     poweroff)
         kill -s USR1 1
