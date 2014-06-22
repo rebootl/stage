@@ -1,0 +1,38 @@
+#!/bin/bash
+# (only to get syntax highlighting)
+#
+
+get_others() {
+    # *** subshell function ***
+    # get services that are not in one of the
+    # shutdown stages
+
+    local all_services
+    all_services=$(ls $COMMON_SERVICE_DIR)
+
+    local stage
+    local services_stage
+    local all_shutdown_services=""
+    for stage in $SHUTDOWN_STAGES; do
+        services_stage=$(get_services_names $stage)
+
+        all_shutdown_services="$services_stage $all_shutdown_services"
+    done
+
+    local service
+    local others=""
+    for service in $all_services; do
+        if [[ ! "$all_shutdown_services" =~ "$service" ]]; then
+            others="$service $others"
+        fi
+    done
+
+    echo $others
+}
+
+# (debug)
+#echo_others() {
+#    others=$(get_others)
+#
+#    echo "Others: $others"
+#}

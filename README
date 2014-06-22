@@ -84,8 +84,9 @@ The provided boot sequence is as follows:
 The provided shutdown sequence:
 
 1) pre_shutdown (stop gettys)
-2) revert SHUTDOWN_STAGES
-3) post_shudown (umount everything, spawn a debug shell)[^2]
+2) stop all services not in one of the SHUTDOWN_STAGES
+3) revert SHUTDOWN_STAGES
+4) post_shudown (umount everything, spawn a debug shell)[^2]
 
 [^2]: See "Not Really issues" 1).
 
@@ -102,7 +103,7 @@ Issues
 1) On shutdown, something needs to be done to stop services that 
    were started manually, and are not in one of the shutdown stages.
    The "others" stage was intented for this, but this should be automated.
-
+   DONE (all services not in one of the SHUTDOWN_STAGES are stopped beforehand)
 
 Not really issues
 -----------------

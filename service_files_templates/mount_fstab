@@ -3,9 +3,14 @@
 # mount filesystems from fstab
 
 start() {
-    mount -a
+    # -a mount from fstab
+    # -F fork
+    mount -aF
+}
+
+stop() {
 }
 
 poll() {
-    return 1
+    return 2
 }

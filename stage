@@ -18,6 +18,7 @@ source $F_DIR/stage_f
 source $F_DIR/stage_helper_f
 
 source $F_DIR/service_f
+source $F_DIR/service_helper_f
 source $F_DIR/service_subf
 
 source $F_DIR/service_manager_f
@@ -68,6 +69,12 @@ on_shutdown() {
 
     # pre-shutdown sequence
     shutdown_pre
+
+    # stop services that are not in the SHUTDOWN_STAGES
+    local others
+    others=$(get_others)
+    echo_color 3 "stage: stopping additional services..."
+    dep_call stop "$others"
 
     local stage
     for stage in $SHUTDOWN_STAGES; do
@@ -188,6 +195,9 @@ case $1 in
     remove)
         check_args_service_stage $2 $3
         service_remove $2 $3
+        ;;
+    others)
+        echo_others
         ;;
     *)
         usage
