@@ -105,7 +105,8 @@ service_info() {
     echo
     echo "Last output:"
     echo "===================="
-    if [ -f "$RTAB_DIR/${1}_out" ]; then
+    if [ -f "$OUT_DIR/${1}_out" ]; then
+        local line
         while read -r line; do
             echo "  $line"
         done < $OUT_DIR/${1}_out
