@@ -4,6 +4,11 @@
 
 shutdown_pre() {
 
+    # switch to vt01
+    # (to see output and needed for debug shell)
+    # (manual switch doesn't work anymore later)
+    chvt 1
+
     # stop the gettys
     pkill -f "/usr/bin/ubase/respawn -d 3 /usr/bin/agetty"
 
@@ -16,10 +21,12 @@ shutdown_post() {
     /usr/bin/umount -a -r
 
     # umount the api filesystem
+# ==> not needed, should be done by above
 #    echo_color 3 "stage: umount the api filesystem..."
 #    umount -r /run
 
     # remount root readonly
+# ==> not needed, is done by above
 #    echo_color 3 "stage: remount / readonly..."
 #    /usr/bin/mount -o remount,ro /
 
